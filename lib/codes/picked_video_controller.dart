@@ -17,6 +17,12 @@ class WebPickedVideoController extends ChangeNotifier {
 
   List<html.File> get data => List.unmodifiable(_data);
 
+  html.File? mayGetCurrentVideo() {
+    final current=_currentPlayingIndex;
+    if(current==null)return null;
+    return _data.elementAtOrNull(current);
+  }
+
   void add(html.File newVideo) {
     _data = [..._data, newVideo];
     notifyListeners();
