@@ -22,8 +22,9 @@ class PlayingVideoCard extends StatelessWidget {
           return const SizedBox();
         }
         return _Individual(
-          key: ValueKey(controller.currentPlayingIndex),
+
           file: videoFile,
+          index: controller.currentPlayingIndex,
         );
       },
     );
@@ -32,10 +33,12 @@ class PlayingVideoCard extends StatelessWidget {
 
 class _Individual extends StatefulWidget {
   final html.File file;
+  final int? index;
 
   const _Individual({
     super.key,
     required this.file,
+    required this.index,
   });
 
   @override
@@ -53,17 +56,17 @@ class _IndividualState extends State<_Individual> {
       ..autoplay = false;
 
     ui.platformViewRegistry.registerViewFactory(
-      'videoElement',
+      'videoElement${widget.index}',
       (int viewId) => videoElement,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return  SizedBox(
       width: 600,
       height: 400,
-      child: HtmlElementView(viewType: 'videoElement'),
+      child: HtmlElementView(viewType: 'videoElement${widget.index}'),
     );
   }
 }
