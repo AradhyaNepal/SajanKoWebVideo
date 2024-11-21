@@ -48,6 +48,8 @@ class PickedVideoCard extends StatelessWidget {
                         child: Text(isPlaying ? "Is Playing" : "Play"),
                       ),
                       const Spacer(),
+                      Text(data[i].name),
+                      const Spacer(),
                     ],
                   ),
                 );

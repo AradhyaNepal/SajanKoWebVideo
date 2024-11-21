@@ -1,8 +1,9 @@
+import 'dart:developer';
 import 'dart:ui_web' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:videoweb/codes/picked_video_controller.dart';
 import 'dart:html' as html;
+
+import 'package:videoweb/codes/picked_video_controller.dart';
 
 class PlayingVideoCard extends StatelessWidget {
   final WebPickedVideoController controller;
@@ -24,6 +25,7 @@ class PlayingVideoCard extends StatelessWidget {
         return _Individual(
           key: ValueKey(controller.currentPlayingIndex),
           file: videoFile,
+          index: controller.currentPlayingIndex, // Ensures unique index
         );
       },
     );
@@ -32,10 +34,12 @@ class PlayingVideoCard extends StatelessWidget {
 
 class _Individual extends StatefulWidget {
   final html.File file;
+  final int? index;
 
   const _Individual({
     super.key,
     required this.file,
+    this.index,
   });
 
   @override
@@ -48,17 +52,25 @@ class _IndividualState extends State<_Individual> {
   @override
   void initState() {
     super.initState();
+    log(widget.file.name);
+
+    // Safeguard against null index for unique viewType
+    final viewType = 'videoElement${widget.index ?? DateTime.now().millisecondsSinceEpoch}';
+
+    // Create the Blob URL
     videoUrl = html.Url.createObjectUrl(widget.file);
 
+    // Create and configure the video element
     final videoElement = html.VideoElement()
       ..src = videoUrl ?? ""
       ..controls = true
       ..muted = true
       ..autoplay = true;
 
+    // Register the video element with the unique viewType
     ui.platformViewRegistry.registerViewFactory(
-      'videoElement',
-      (int viewId) => videoElement,
+      viewType,
+          (int viewId) => videoElement,
     );
   }
 
@@ -75,10 +87,13 @@ class _IndividualState extends State<_Individual> {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    // Safeguard for unique viewType
+    final viewType = 'videoElement${widget.index ?? DateTime.now().millisecondsSinceEpoch}';
+
+    return SizedBox(
       width: 600,
       height: 400,
-      child: HtmlElementView(viewType: 'videoElement'),
+      child: HtmlElementView(viewType: viewType),
     );
   }
 }
