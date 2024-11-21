@@ -22,6 +22,7 @@ class PlayingVideoCard extends StatelessWidget {
           return const SizedBox();
         }
         return _Individual(
+          key: ValueKey(controller.currentPlayingIndex),
           file: videoFile,
         );
       },
@@ -42,28 +43,42 @@ class _Individual extends StatefulWidget {
 }
 
 class _IndividualState extends State<_Individual> {
+  String? videoUrl;
+
   @override
   void initState() {
     super.initState();
-    final url = html.Url.createObjectUrl(widget.file);
+    videoUrl = html.Url.createObjectUrl(widget.file);
+
     final videoElement = html.VideoElement()
-      ..src = url
+      ..src = videoUrl ?? ""
       ..controls = true
-      ..autoplay = false;
+      ..muted = true
+      ..autoplay = true;
 
     ui.platformViewRegistry.registerViewFactory(
-      'videoElement${widget.file.relativePath}',
+      'videoElement',
       (int viewId) => videoElement,
     );
   }
 
   @override
+  void dispose() {
+    if (videoUrl != null) {
+      // Revoke the Blob URL to free memory
+      html.Url.revokeObjectUrl(videoUrl!);
+      videoUrl = null;
+    }
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: 600,
       height: 400,
-      child:
-          HtmlElementView(viewType: 'videoElement${widget.file.relativePath}'),
+      child: HtmlElementView(viewType: 'videoElement'),
     );
   }
 }
